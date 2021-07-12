@@ -64,12 +64,8 @@ const getAnalyticsConfig = (eventConfig, eventType) => {
     }
 
     switch (eventType) {
-        case GasEventTypes.SCREEN:
-            return {
-                name: 'main', // required
-                ...baseConfig
-            }
         case GasEventTypes.TRACK:
+        case GasEventTypes.OPERATIONAL:
         case GasEventTypes.UI:
             // console.log(event);
             const actionSubjectId = eventConfig.actionsubjectid;
@@ -85,7 +81,6 @@ const getAnalyticsConfig = (eventConfig, eventType) => {
                 actionSubject,
                 action
             }
-        case GasEventTypes.OPERATIONAL:
     }
 }
 
