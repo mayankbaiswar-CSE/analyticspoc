@@ -50,9 +50,9 @@ export const AnalyticsConfig = {
     }
 }
 
-const getAnalyticsConfig = (event, eventType) => {
-    if (!event.target) {
-        console.error('Not a valid HTML event target');
+const getAnalyticsConfig = (eventConfig, eventType) => {
+    if (!eventConfig) {
+        console.error('Not a valid analytics event config.');
         return;
     }
     let baseConfig = {
@@ -71,12 +71,12 @@ const getAnalyticsConfig = (event, eventType) => {
             }
         case GasEventTypes.TRACK:
         case GasEventTypes.UI:
-            console.log(event);
-            const actionSubjectId = event.target.getAttribute('data-actionsubjectid');
-            const actionSubject = event.target.getAttribute('data-actionsubject');
-            const action = event.target.getAttribute('data-action');
+            // console.log(event);
+            const actionSubjectId = eventConfig.actionsubjectid;
+            const actionSubject = eventConfig.actionsubject;
+            const action = eventConfig.action;
             if (!actionSubjectId || !actionSubject || !action) {
-                console.error(`Please make sure to set data-actionsubjectid, data-actionsubject, data-action on the HTML element for sending UI events`);
+                console.error(`Please make sure to set actionsubjectid, actionsubject, action on the HTML element for sending UI events`);
                 return;
             }
             return {
@@ -90,7 +90,6 @@ const getAnalyticsConfig = (event, eventType) => {
 }
 
 const useAnalytics = () => {
-    // initialise metal/gas/sentry
 
     const sendObservability = () => {
         const productInfo = {
@@ -108,7 +107,8 @@ const useAnalytics = () => {
 
     }
 
-    const sendAnalytics = (source) => (event, eventType) => {
+    const sendAnalytics = (source, eventType) => {
+
         const analyticsClient = new AnalyticsWebClient({
             env: envType.DEV, // required
             product: 'css-xp', // required
@@ -118,7 +118,6 @@ const useAnalytics = () => {
             locale: 'en-US',
         });
         analyticsClient.setTenantInfo(tenantType.NONE);
-        // analyticsClient.
 
         let sendEvent;
         switch (eventType) {
@@ -136,11 +135,21 @@ const useAnalytics = () => {
                 break;
         }
 
-        try {
-            const config = getAnalyticsConfig(event, eventType);
-            sendEvent({ ...config, source });
-        } catch (err) {
-            console.error(err);
+        const eventAnalyticsHandler = (eventConfig) => {
+            try {
+                const config = getAnalyticsConfig(eventConfig, eventType);
+                sendEvent({ ...config, source });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        switch (eventType) {
+            case GasEventTypes.SCREEN:
+                sendEvent({ name: source });
+                break;
+            default:
+                return eventAnalyticsHandler;
         }
     }
 

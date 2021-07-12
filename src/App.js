@@ -5,7 +5,7 @@ import useAnalytics, { GasEventTypes, AnalyticsConfig } from './useAnalytics';
 function App() {
   const { sendAnalytics, sendObservability } = useAnalytics();
   sendObservability()
-  const analytics = sendAnalytics('invoiceScreen');
+  const analytics = sendAnalytics('invoiceScreen', GasEventTypes.UI);
   return (
     <div className="App">
       <header className="App-header">
@@ -15,12 +15,13 @@ function App() {
         </p>
         <a
           // data-analytics={true}
-          onClick={(e) => {
-            analytics(e, GasEventTypes.UI);
+          onClick={() => {
+            analytics({
+                actionsubject: AnalyticsConfig[GasEventTypes.UI].SUBJECT.BUTTON,
+                action: AnalyticsConfig[GasEventTypes.UI].ACTION.CLICKED,
+                actionsubjectid: AnalyticsConfig[GasEventTypes.UI].SUBJECTID.OPENSIDEBARLINK
+              });
           }}
-          data-actionsubject={AnalyticsConfig[GasEventTypes.UI].SUBJECT.BUTTON}
-          data-action={AnalyticsConfig[GasEventTypes.UI].ACTION.CLICKED}
-          data-actionsubjectid={AnalyticsConfig[GasEventTypes.UI].SUBJECTID.OPENSIDEBARLINK}
           className="App-link"
           href="https://reactjs.org"
           target="_blank"
